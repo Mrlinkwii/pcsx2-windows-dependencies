@@ -9,7 +9,7 @@ jobs:
   create-release:
     runs-on: windows-2022
     steps:
-    - uses: actions/checkout@v3.6.0
+    - uses: actions/checkout@v6
       with:
         repository: "PCSX2/pcsx2"
         fetch-depth: 0
@@ -26,11 +26,9 @@ jobs:
         "C:\Program Files\7-Zip\7z.exe" a pcsx2-windows-dependencies.7z .\deps
 
     - name: Create Release
-      uses: "marvinpinto/action-automatic-releases@latest"
-      with:
-        repo_token: "${{ secrets.GITHUB_TOKEN }}"
-        automatic_release_tag: "latest-windows-dependencies"
-        prerelease: false
-        title: "Latest Dependencies Build"
-        files: |
-          pcsx2-windows-dependencies.7z
+      env:
+        GH_TOKEN: ${{ github.token }}
+      run: |
+        gh release delete latest-windows-dependencies --cleanup-tag --yes --repo PCSX2/pcsx2-windows-dependencies || true
+        gh release create latest-windows-dependencies --latest --title "Latest Dependencies Build" --repo PCSX2/pcsx2-windows-dependencies
+        gh release upload latest-windows-dependencies ./pcsx2-windows-dependencies.7z --repo PCSX2/pcsx2-windows-dependencies
